@@ -1,0 +1,68 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class MiRNAfinderFromGenes {
+	public static void associaMiRNAaiGeni() throws IOException {
+		Set<String> setGenes = new TreeSet<String>();
+		String line;
+		BufferedReader genes = new BufferedReader(
+				new FileReader(
+				"D:\\Chip CTL\\SoloGeneIDs.txt"));
+		genes.readLine();
+		
+		while ((line = genes.readLine()) != null) {
+			//String[] field = line.split("\t");	
+			
+				setGenes.add(line);							
+		}
+		System.out.println("numero geneIDs: "+setGenes.size());
+		String line1;
+		//String line2;
+		BufferedWriter bw = new BufferedWriter(new FileWriter("D:\\Chip CTL\\CTLmiRNAs.txt"));
+
+		BufferedReader hg19_predictions = new BufferedReader(
+				new FileReader(
+				"D:\\Chip CTL\\hg19_predictions_S_C_aug2010.txt"));
+		String line0 = hg19_predictions.readLine();
+		bw.write(line0+"\r\n");
+		while ((line1 = hg19_predictions.readLine()) != null) {
+			String[] field1 = line1.split("\t");	
+			//System.out.println(field1[2]);
+			if (setGenes.contains(field1[2])) {
+				//System.out.println("ok");
+				bw.write(line1+"\r\n");
+				bw.flush();
+			}
+//			Iterator<String> it = setGenes.iterator();
+//			while (it.hasNext()) {
+//				line2 = it.next();
+//				//System.out.println(line2);
+//				if (line2.toString().equalsIgnoreCase(field1[2])) {
+//					System.out.println("ok");
+//					bw.write(line1+"\r\n");
+//					bw.flush();
+//				}
+//			}
+		} bw.close(); System.out.println("ho concluso!");
+		hg19_predictions.close();
+		genes.close();
+	}
+	
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		//MiRNAfinderFromGenes geneIDs = new MiRNAfinderFromGenes();
+		MiRNAfinderFromGenes.associaMiRNAaiGeni();
+	}
+
+}
