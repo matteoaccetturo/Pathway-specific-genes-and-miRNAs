@@ -1,0 +1,125 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class miRNAstatistics {
+
+	/**
+	 * @param args
+	 */
+	
+	public static Set<String> SetGene2goHuman() throws IOException {
+		String line2;
+		Set<String> gene2goHuman = new TreeSet<String>();
+		BufferedReader br2 = new BufferedReader(
+				new FileReader(
+				"C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\gene2go15-04-2011_human.txt"));
+		br2.readLine();
+		while ((line2 = br2.readLine()) != null) {
+				gene2goHuman.add(line2);			
+		}br2.close();
+		return gene2goHuman;
+	}
+	
+	private static Set<String> listaMiRNAumani() throws IOException{
+		String line2;
+		Set<String> miRNAs = new TreeSet<String>();
+		BufferedReader humanGeneInfo = new BufferedReader(
+				new FileReader(
+				"C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\Homo_sapiens.gene_info"));
+		humanGeneInfo.readLine();
+		while ((line2 = humanGeneInfo.readLine()) != null) {
+			String[] field = line2.split("\t");	
+			if (field[5].contains("miRBase")) {
+				miRNAs.add(line2);
+			}
+						
+		}//System.out.println(miRNAs.size());
+		humanGeneInfo.close();
+		return miRNAs;
+	}
+	
+	private static Set<String> geneIDsmiRNAs() throws IOException{
+		String line2;
+		Set<String> geneIDsmiRNAs = new TreeSet<String>();
+		
+		Iterator<String> it = listaMiRNAumani().iterator();
+		while (it.hasNext()) {
+			line2 = it.next();
+			String[] field = line2.split("\t");	
+			
+				geneIDsmiRNAs.add(field[1]);
+			
+						
+		}//System.out.println(geneIDsmiRNAs);
+		
+		return geneIDsmiRNAs;
+	}
+	
+	public static Set<String> SetGoTermsmiRNAsUmani() throws IOException {
+		String line3;
+		BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\miRNAumaniConGOterms.txt"));
+
+		Set<String> GOtermsmiRNAsUmani = new TreeSet<String>();
+		Iterator<String> it = SetGene2goHuman().iterator();
+		Set<String> tmp = geneIDsmiRNAs();
+		while (it.hasNext()) {
+			line3 = it.next();
+			String[] field = line3.split("\t");
+			//for (String string : ListaCandidatiTot()) {
+			if (tmp.contains(field[1])) {
+				System.out.println("ciao");
+				GOtermsmiRNAsUmani.add(field[2]);
+				bw.write(line3);
+				bw.flush();
+			}			
+		}bw.close();System.out.println("numero goTerms dei miRNA: "+GOtermsmiRNAsUmani.size());
+		return GOtermsmiRNAsUmani;
+	}
+	
+	
+	public static Set<String> confrontoGeneCTD() throws IOException {
+		String line2;
+		Set<String> miRNActd = new TreeSet<String>();
+		BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\CTDmiRNA-diseaseUmani.txt"));
+		BufferedWriter bw1 = new BufferedWriter(new FileWriter("C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\miRNAumaniCTD.txt"));
+		
+		BufferedReader ctd = new BufferedReader(
+				new FileReader(
+				"C:\\Documents and Settings\\Administrator\\My Documents\\miRNA\\CTD_gene_disease_relations.tsv"));
+		ctd.readLine();
+		Set<String> tmp = geneIDsmiRNAs();
+		while ((line2 = ctd.readLine()) != null) {
+			String[] field = line2.split("\t");	
+			if (tmp.contains(field[1])) {
+				miRNActd.add(field[0]);
+				bw.write(line2+"\r\n");
+				bw.flush();
+				bw1.write(field[0]+"\t"+field[1]+"\r\n");
+				bw1.flush();
+			}
+						
+		}bw.close();System.out.println("numero di miRNA ctd: "+miRNActd.size());
+			
+		return miRNActd;
+			
+				
+			}			
+		
+		
+	
+	
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+miRNAstatistics miRNAsUmani = new miRNAstatistics();
+//miRNAsUmani.listaMiRNAumani();
+miRNAstatistics.SetGoTermsmiRNAsUmani();
+miRNAstatistics.confrontoGeneCTD();
+	}
+
+}
